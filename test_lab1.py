@@ -22,6 +22,7 @@ SEEDS = (
     "28075067910",
     "58495397832",
     "17836548901",
+    "09846738943",
 )
 # Tuple with the ranges for the random module to generate the values coinciding
 # with those in the test files.
@@ -35,13 +36,14 @@ RANGES = (
     (100, 35, 22),
     (3, 100, 13),
     (1000, 16, 16),
+    (20, 5, 5),
 )
 # Part of the names of the arbitrary created-files that contains the nodes.
 NODES_FILE = "lastfm_asia_target_test_reduced"
 # Part of the names of the arbitrary created-files that contains the edges.
 EDGE_FILES = "lastfm_asia_edges_test_reduced"
 # Tuple with the last part of the names of the arbitrary created_files.
-NAMES = ("1", "2", "3", "4", "5", "6", "7", "8", "9")
+NAMES = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
 # File type.
 CSV = ".csv"
 # Standaard messages of the main program.
@@ -355,10 +357,18 @@ def test_how_many_degrees(expected_graph, obtained_graph):
         The test is passed without an AssertionError generated.
 
     """
+    dist, next_node = lab1.floyd_algorithm(obtained_graph)
     for node_a in list(expected_graph.nodes):
         for node_b in list(expected_graph.nodes):
             try:
-                obtained_path = lab1.how_many_degrees(obtained_graph, node_a, node_b)
+                if next_node[node_a][node_b] is None:
+                    obtained_path = None
+                else:
+                    obtained_path = [node_a]
+                    u = node_a
+                    while u != node_b:
+                        u = next_node[u][node_b]
+                        obtained_path.append(u)
                 expected_path = nx.algorithms.shortest_paths.generic.shortest_path(
                     expected_graph, node_a, node_b
                 )
@@ -420,7 +430,7 @@ faster = []
 # Bucle used to executed the test with each test-file and test-seed.
 for seeds, ranges, names in zip(SEEDS, RANGES, NAMES):
     # Error control, if an assert error is raised, catch the error, prints the
-    # reason and allows th test to be executed with the next file.
+    # reason and allows the test to be executed with the next file.
     try:
         print(DELIMITER)
         print("TESTING FILE: " + names)
@@ -471,19 +481,19 @@ for seeds, ranges, names in zip(SEEDS, RANGES, NAMES):
         TESTS_PASSED += 1
 
         FILES_COMPLETED += 1
-    except AssertionError as msg:
-        print("\t\tFalse: " + str(msg))
+    # except AssertionError as msg:
+    #     print("\t\tFalse: " + str(msg))
     except TypeError as msg:
         print("\t\tFalse: " + str(msg))
     finally:
         print(DELIMITER)
 # If all the BFS/DFS comparation of the test files are executed correctly
 # executes the BFS/DFS comparation with the lastfm graph.
-# if len(faster) == 9:
-if FILES_COMPLETED == 9:
+if len(faster) == len(NAMES):
+    # if FILES_COMPLETED == len(NAMES):
     print(DELIMITER)
     print("Testing relation time of BFS/DFS using intended graph:")
-    tp = test_faster_extended(100)
+    tp = test_faster_extended(1)
     print(TM.format(tp[0], tp[1], tp[2], tp[3], tp[4]))
     if tp[4] < 1:
         faster.append("BFS")
@@ -495,7 +505,7 @@ if FILES_COMPLETED == 9:
     FILES_COMPLETED += 1
     print(DELIMITER)
 # Prints the results of the tests.
-print("Files completed: " + str(FILES_COMPLETED) + "/10")
-print("Tests passed: " + str(TESTS_PASSED) + "/55")
+print("Files completed: " + str(FILES_COMPLETED) + "/" + str(len(NAMES) + 1))
+print("Tests passed: " + str(TESTS_PASSED) + "/" + str(6 * len(NAMES) + 1))
 print("Tests faster with BFS: " + str(faster.count("BFS")) + "/" + str(len(faster)))
 print("Tests faster with DFS: " + str(faster.count("DFS")) + "/" + str(len(faster)))
