@@ -295,4 +295,7 @@ def floyd_algorithm(G=graph):
 
 def diameters(G=graph):
     dist, next_node = floyd_algorithm(G)
-    return max([max(i) for i in dist])
+    diameter = max([max(i.values()) for i in dist.values()])
+    if diameter == float('inf'):
+        return None
+    return diameter
