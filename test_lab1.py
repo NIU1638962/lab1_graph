@@ -421,8 +421,8 @@ def test_diameters(expected_graph, obtained_graph):
 
 
 # MAIN
-"""Executes the following functions given 9 diferent files and seeds and a
-BFS/DFS comparation with the lastfm graph. In total 10 files and 55 tests"""
+"""Executes the following functions given 10 diferent files and seeds and a
+BFS/DFS comparation with the lastfm graph. In total 11 files and 55 tests"""
 # Variable used to store tha inforamtion about the tests.
 TESTS_PASSED = 0
 FILES_COMPLETED = 0
@@ -481,8 +481,8 @@ for seeds, ranges, names in zip(SEEDS, RANGES, NAMES):
         TESTS_PASSED += 1
 
         FILES_COMPLETED += 1
-    # except AssertionError as msg:
-    #     print("\t\tFalse: " + str(msg))
+    except AssertionError as msg:
+         print("\t\tFalse: " + str(msg))
     except TypeError as msg:
         print("\t\tFalse: " + str(msg))
     finally:
