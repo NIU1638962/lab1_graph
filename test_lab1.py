@@ -8,7 +8,7 @@ import os
 import random
 import timeit
 import networkx as nx
-import lab1
+import lab1_JTS as lab1
 import generate_csv_files_from_random_seed
 
 
