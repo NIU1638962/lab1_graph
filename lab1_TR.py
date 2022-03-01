@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def build_lastfm_graph(filename='lastfm_asia_edges.csv'):
+def build_lastfm_graph(targetfile=None,filename='lastfm_asia_edges.csv'):
     f = open(filename, 'r')
     G = nx.Graph()
 
     for line in f.read().split():
         if 'node' not in line:
             a, b = line.split(',')
-            G.add_edge(int(a), int(b))
+            G.add_edge(a, b)
 
     return G
 
