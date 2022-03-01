@@ -4,10 +4,12 @@ Created on Thu Feb 17 09:13:14 2022
 
 @author: Joel Tapia Salvador (1638962)
 """
+import os
 import random
 import timeit
 import networkx as nx
 import lab1
+import generate_csv_files_from_random_seed
 
 
 # Tuple with the seeds for the random module of the arbitrary generated values
@@ -49,11 +51,13 @@ CSV = ".csv"
 # Standaard messages of the main program.
 TESTING = 'Testing "{}" function: '
 PSD = "\tPassed => "
-TM = (
+TM1 = (
     "\tBFS time =>\n\t\t{0}\n\tBFS average =>\n\t\t{2}\n\t"
     + "DFS time =>\n\t\t{1}\n\tDFS average =>\n\t\t{3}\n\t"
     + "BFS / DFS relation =>\n\t\t{4}"
 )
+TM2 = "\t{0} time =>\n\t\t{1}\n\t{0} average =>\n\t\t{2}"
+TM3 = TESTING = 'Testing time "{}" function with lastfm graph: '
 DELIMITER = "--------------------------------------------------------------"
 
 
@@ -303,6 +307,145 @@ ls = lab1.how_many_components_DFS(G)"""
     return times1, times2, average1, average2, proportion
 
 
+def test_how_many_degrees(expected_graph, obtained_graph):
+    """
+    Tests the function "how_many_degrees" from the module "lab1" with all pair
+    of nodes of the given graph.
+
+    Parameters
+    ----------
+    expected_graph : networkx graph type
+        Is the graph used to compare the the result of the functions tested.
+    obtained_graph : networkx graph type
+        Is the graph were the functions tested are aplied.
+
+    Returns
+    -------
+    bool
+        The test is passed without an AssertionError generated.
+
+    """
+    # The function "how_many_degrees" calls the funtion "floyd_algorithm" to
+    # calculate the shortest path every time, to avoid such waist of time,
+    # recalculating the matrix for every pair of nodes we run one time
+    # "floyd_algorithm" and extract the path as the same way that
+    # "how_many_degrees" does.
+    dist, next_node = lab1.floyd_algorithm(obtained_graph)
+    # We run "floyd_warshall" functions oF networkx to ensure that the
+    # result is the same as ours, when there is more than one possible
+    # shortest path "algorithms.shortest_paths.generic.shortest_path" function
+    # uses Dijkstra's algorithm that return a different shortest path than the
+    # one that returns Floyd's algorithm.
+    pred, _ = nx.floyd_warshall_predecessor_and_distance(expected_graph)
+
+    for node_a in list(expected_graph.nodes):
+        for node_b in list(expected_graph.nodes):
+            try:
+                # Makes a list with the path (copy of the "how_many_degrees")
+                if next_node[node_a][node_b] is None:
+                    obtained_path = None
+                elif node_a == node_b:
+                    obtained_path = []
+                else:
+                    obtained_path = [node_a]
+                    u = node_a
+                    while u != node_b:
+                        u = next_node[u][node_b]
+                        obtained_path.append(u)
+                # expected_path = nx.algorithms.shortest_paths.generic.shortest_path(
+                # expected_graph, node_a, node_b
+                # )
+                expected_path = nx.reconstruct_path(node_a, node_b, pred)
+                expected_length_path = len(expected_path)
+                obtained_length_path = len(obtained_path)
+                assert expected_length_path == obtained_length_path, (
+                    "Length of path doesn't match with expected result."
+                    + "\n\t\tObtained length of path => "
+                    + str(obtained_length_path)
+                    + "\n\t\tExpected length of path => "
+                    + str(expected_length_path)
+                )
+                assert expected_path == obtained_path, (
+                    "Path doesn't match with expected result."
+                    + "\n\t\tObtained path => "
+                    + str(obtained_path)
+                    + "\n\t\tExpected path => "
+                    + str(expected_path)
+                )
+            except nx.NetworkXNoPath:
+                assert obtained_path is None, (
+                    "Path not expected and path is returned."
+                    + "\n\t\tObtained path => "
+                    + str(obtained_path)
+                )
+            except KeyError:
+                assert obtained_path is None, (
+                    "Path not expected and path is returned."
+                    + "\n\t\tObtained path => "
+                    + str(obtained_path)
+                )
+    return True
+
+
+def test_diameters(expected_graph, obtained_graph):
+    """
+
+
+    Returns
+    -------
+    bool
+        DESCRIPTION.
+
+    """
+    try:
+        obtained_diameter = lab1.diameters(obtained_graph)
+        expected_diameter = nx.algorithms.distance_measures.diameter(expected_graph)
+        assert expected_diameter == obtained_diameter, (
+            "Diameter doesn't match with expected result"
+            + "\n\t\tObtained diameter => "
+            + str(obtained_diameter)
+        )
+    except nx.NetworkXError:
+        assert obtained_diameter is None, (
+            "Diameter doesn't match with expected result"
+            + "\n\t\tObtained diameter => "
+            + str(obtained_diameter)
+        )
+    return True
+
+
+def test_time_build(iteration=10000):
+    """
+    Tests the speed of the function "build_lastfm_graph" over a given number of
+    iterations (by default 10000) using the intended graph.
+
+    Parameters
+    ----------
+    iteration : integer, optional
+        Number of times the methods are tested to evaluate velocity. The
+        default is 10000.
+
+    Returns
+    -------
+    The total time of BFS function anf DFS function, the average for iteration
+    of BFS funtion anf DFS function and the relation between the time of the
+    BFS function anf DFS fucntion in a string. If it is > 1, BFS is slower than
+    DFS and if it is < 1 BFS is faster than DFS.
+
+    """
+    setup_code = """
+import lab1
+NODES_FILE = "lastfm_asia_target.csv"
+EDGES_FILE = "lastfm_asia_edges.csv" """
+    test_code = """
+ls = lab1.build_lastfm_graph(NODES_FILE, EDGES_FILE)"""
+
+    times = timeit.repeat(setup=setup_code, stmt=test_code, number=iteration)
+    times = sum(times)
+    average = times / iteration
+    return times, average
+
+
 def test_faster_extended(iteration=10000):
     """
     Tests the speed of the functions BFS and DFS over a given number of
@@ -339,94 +482,83 @@ ls = lab1.how_many_components_DFS(G)"""
     return times1, times2, average1, average2, proportion
 
 
-def test_how_many_degrees(expected_graph, obtained_graph):
+def test_time_how_many_degrees(iteration=10000):
     """
-    Tests the function "how_many_degrees" from the module "lab1" with all pair
-    of nodes of the given graph.
+    Tests the speed of the function "how_many_degrees" over a given number of
+    iterations (by default 10000) using the intended graph.
 
     Parameters
     ----------
-    expected_graph : networkx graph type
-        Is the graph used to compare the the result of the functions tested.
-    obtained_graph : networkx graph type
-        Is the graph were the functions tested are aplied.
+    iteration : integer, optional
+        Number of times the methods are tested to evaluate velocity. The
+        default is 10000.
 
     Returns
     -------
-    bool
-        The test is passed without an AssertionError generated.
+    The total time of BFS function anf DFS function, the average for iteration
+    of BFS funtion anf DFS function and the relation between the time of the
+    BFS function anf DFS fucntion in a string. If it is > 1, BFS is slower than
+    DFS and if it is < 1 BFS is faster than DFS.
 
     """
-    dist, next_node = lab1.floyd_algorithm(obtained_graph)
-    for node_a in list(expected_graph.nodes):
-        for node_b in list(expected_graph.nodes):
-            try:
-                if next_node[node_a][node_b] is None:
-                    obtained_path = None
-                else:
-                    obtained_path = [node_a]
-                    u = node_a
-                    while u != node_b:
-                        u = next_node[u][node_b]
-                        obtained_path.append(u)
-                expected_path = nx.algorithms.shortest_paths.generic.shortest_path(
-                    expected_graph, node_a, node_b
-                )
-                expected_length_path = len(expected_path)
-                obtained_length_path = len(obtained_path)
-                assert expected_length_path == obtained_length_path, (
-                    "Length of path doesn't match with expected result."
-                    + "\n\t\tObtained length of path => "
-                    + str(obtained_length_path)
-                )
-                assert expected_path == obtained_path, (
-                    "Path doesn't match with expected result."
-                    + "\n\t\tObtained path => "
-                    + str(obtained_path)
-                )
-            except nx.NetworkXNoPath:
-                assert obtained_path is None, (
-                    "Path not expected and path is returned."
-                    + "\n\t\tObtained path => "
-                    + str(obtained_path)
-                )
-    return True
+    setup_code = """
+import lab1
+G = lab1.build_lastfm_graph() """
+    test_code = """
+ls = lab1.how_many_degrees(G, '0', '7580')"""
+
+    times = timeit.repeat(setup=setup_code, stmt=test_code, number=iteration)
+    times = sum(times)
+    average = times / iteration
+    return times, average
 
 
-def test_diameters(expected_graph, obtained_graph):
+def test_time_diameter(iteration=10000):
     """
+    Tests the speed of the function "diameters" over a given number of
+    iterations (by default 10000) using the intended graph.
 
+    Parameters
+    ----------
+    iteration : integer, optional
+        Number of times the methods are tested to evaluate velocity. The
+        default is 10000.
 
     Returns
     -------
-    bool
-        DESCRIPTION.
+    The total time of BFS function anf DFS function, the average for iteration
+    of BFS funtion anf DFS function and the relation between the time of the
+    BFS function anf DFS fucntion in a string. If it is > 1, BFS is slower than
+    DFS and if it is < 1 BFS is faster than DFS.
 
     """
-    try:
-        obtained_diameter = lab1.diameters(obtained_graph)
-        expected_diameter = nx.algorithms.distance_measures.diameter(expected_graph)
-        assert expected_diameter == obtained_diameter, (
-            "Diameter doesn't match with expected result"
-            + "\n\t\tObtained diameter => "
-            + str(obtained_diameter)
-        )
-    except nx.NetworkXError:
-        assert obtained_diameter is None, (
-            "Diameter doesn't match with expected result"
-            + "\n\t\tObtained diameter => "
-            + str(obtained_diameter)
-        )
-    return True
+    setup_code = """
+import lab1
+G = lab1.build_lastfm_graph() """
+    test_code = """
+ls = lab1.diameters(G)"""
+
+    times = timeit.repeat(setup=setup_code, stmt=test_code, number=iteration)
+    times = sum(times)
+    average = times / iteration
+    return times, average
 
 
 # MAIN
 """Executes the following functions given 10 diferent files and seeds and a
-BFS/DFS comparation with the lastfm graph. In total 11 files and 55 tests"""
+BFS/DFS comparation with the lastfm graph. In total 11 files and 64 tests"""
 # Variable used to store tha inforamtion about the tests.
 TESTS_PASSED = 0
 FILES_COMPLETED = 0
 faster = []
+times = int(
+    input(
+        "How many times should the algorithms be tested to extract the average"
+        + "running time: "
+    )
+)
+# Creates the tests files.
+generate_csv_files_from_random_seed
 # Bucle used to executed the test with each test-file and test-seed.
 for seeds, ranges, names in zip(SEEDS, RANGES, NAMES):
     # Error control, if an assert error is raised, catch the error, prints the
@@ -460,8 +592,8 @@ for seeds, ranges, names in zip(SEEDS, RANGES, NAMES):
         TESTS_PASSED += 1
         # Test 4.
         print("Testing relation time of BFS/DFS using test graph:")
-        tp = test_faster_reduced(names, 100)
-        print(TM.format(tp[0], tp[1], tp[2], tp[3], tp[4]))
+        tp = test_faster_reduced(names, times)
+        print(TM1.format(tp[0], tp[1], tp[2], tp[3], tp[4]))
         if tp[4] < 1:
             faster.append("BFS")
         elif tp[4] > 1:
@@ -482,19 +614,26 @@ for seeds, ranges, names in zip(SEEDS, RANGES, NAMES):
 
         FILES_COMPLETED += 1
     except AssertionError as msg:
-         print("\t\tFalse: " + str(msg))
+        print("\t\tFalse: " + str(msg))
     except TypeError as msg:
         print("\t\tFalse: " + str(msg))
     finally:
         print(DELIMITER)
-# If all the BFS/DFS comparation of the test files are executed correctly
-# executes the BFS/DFS comparation with the lastfm graph.
-if len(faster) == len(NAMES):
-    # if FILES_COMPLETED == len(NAMES):
+# If all the the test are completed without an assertion error (test are
+# passed), executes the functions with the intended lastfm graph and calculates
+# the execution time.
+if FILES_COMPLETED == len(NAMES):
+    # Time 1.
     print(DELIMITER)
+    print("TESTING FILE: lastfm")
+    print(TM3.format("build_lastfm_graph()"))
+    tp = test_time_build(times)
+    print(TM2.format("build_lastfm_graph()", tp[0], tp[1]))
+    TESTS_PASSED += 1
+    # Time 2
     print("Testing relation time of BFS/DFS using intended graph:")
-    tp = test_faster_extended(1)
-    print(TM.format(tp[0], tp[1], tp[2], tp[3], tp[4]))
+    tp = test_faster_extended(times)
+    print(TM1.format(tp[0], tp[1], tp[2], tp[3], tp[4]))
     if tp[4] < 1:
         faster.append("BFS")
     elif tp[4] > 1:
@@ -502,10 +641,25 @@ if len(faster) == len(NAMES):
     else:
         faster.append("TIE")
     TESTS_PASSED += 1
+    # Time 3
+    print(TM3.format("how_many_degrees(G, a, b)"))
+    tp = test_time_how_many_degrees(times)
+    print(TM2.format("how_many_degrees(G, a, b)", tp[0], tp[1]))
+    TESTS_PASSED += 1
+    # Time 4
+    print(TM3.format("diameters()"))
+    tp = test_time_diameter(times)
+    print(TM2.format("diameters()", tp[0], tp[1]))
+    TESTS_PASSED += 1
+
     FILES_COMPLETED += 1
     print(DELIMITER)
 # Prints the results of the tests.
 print("Files completed: " + str(FILES_COMPLETED) + "/" + str(len(NAMES) + 1))
-print("Tests passed: " + str(TESTS_PASSED) + "/" + str(6 * len(NAMES) + 1))
+print("Tests passed: " + str(TESTS_PASSED) + "/" + str(6 * len(NAMES) + 4))
 print("Tests faster with BFS: " + str(faster.count("BFS")) + "/" + str(len(faster)))
 print("Tests faster with DFS: " + str(faster.count("DFS")) + "/" + str(len(faster)))
+# Delate the test files.
+for names in NAMES:
+    os.remove(NODES_FILE + names + CSV)
+    os.remove(EDGE_FILES + names + CSV)
