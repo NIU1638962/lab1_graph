@@ -349,8 +349,8 @@ def test_how_many_degrees(expected_graph, obtained_graph):
         The test is passed without an AssertionError generated.
 
     """
-    nodes_a = (0, 1, 2, 3, 4)
-    nodes_b = (4, 2, 4, 0, 1)
+    nodes_a = ('0', '1', '2', '3', '4')
+    nodes_b = ('4', '2', '4', '0', '1')
     for node_a, node_b in zip(nodes_a, nodes_b):
         try:
             obtained_path = lab1.how_many_degrees(obtained_graph, node_a, node_b)
