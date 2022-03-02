@@ -4,15 +4,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def build_lastfm_graph(targetfile=None,filename='lastfm_asia_edges.csv'):
-    f = open(filename, 'r')
+def build_lastfm_graph(filename="lastfm_asia_edges.csv"):
+    f = open(filename, "r")
     G = nx.Graph()
 
     for line in f.read().split():
-        if 'node' not in line:
-            a, b = line.split(',')
+        if "node" not in line:
+            a, b = line.split(",")
             G.add_edge(a, b)
-
     return G
 
 
@@ -35,10 +34,9 @@ def how_many_components_BFS(G):
                 if i not in visited:
                     visited.append(i)
                     queue.append(i)
-
         component_list.append(visited)
-
     return component_list
+
 
 def DFS(v, g, current):
     if current not in v:
@@ -53,25 +51,23 @@ def how_many_components_DFS(G):
 
     # make a list of all the nodes
     graph = list(G.nodes())
-    
+
     # start the search from the first node
-    
 
     while graph:
         current = graph[0]
         visited = []
         DFS(visited, G, current)
-        print(visited)
+        # print(visited)
         component_list.append(visited)
 
         for x in visited:
             graph.remove(x)
-
     return component_list
 
 
 def how_many_degrees(G, a, b):
-    total = [[a,0]]
+    total = [[a, 0]]
     queue = [(a, 0)]
     visited = []
     while queue:
@@ -84,7 +80,6 @@ def how_many_degrees(G, a, b):
         for adjacent in G.neighbors(node):
             queue.append((adjacent, distance + 1))
             total.append([adjacent, distance + 1])
-
     distancedict = {}
     for item in total:
         node = item[0]
@@ -93,7 +88,6 @@ def how_many_degrees(G, a, b):
             distancedict[node] = distance
         elif distance < distancedict[node]:
             distancedict[node] = distance
-
     if b in distancedict:
         return distancedict[b]
 
@@ -108,6 +102,5 @@ def diameter(G):
         for j in graph:
             if j not in checked:
                 distances.append(how_many_degrees(G, i, j))
-
     distances = list(filter(None, distances))
     return max(distances)
