@@ -300,7 +300,7 @@ def test_faster_reduced(name_i, iteration=10000):
     """
     setup_code = (
         """
-import lab1
+import lab1_JTS as lab1
 NODES_FILE = "lastfm_asia_target_test_reduced"""
         + name_i
         + """.csv"
@@ -450,7 +450,7 @@ def test_time_build(iteration=10000):
 
     """
     setup_code = """
-import lab1
+import lab1_JTS as lab1
 NODES_FILE = "lastfm_asia_target.csv"
 EDGES_FILE = "lastfm_asia_edges.csv" """
     test_code = """
@@ -482,7 +482,7 @@ def test_faster_extended(iteration=10000):
 
     """
     setup_code = """
-import lab1
+import lab1_JTS as lab1
 G = lab1.build_lastfm_graph()"""
     test_code1 = """
 ls = lab1.how_many_components_BFS(G)"""
@@ -518,7 +518,7 @@ def test_time_how_many_degrees(iteration=10000):
 
     """
     setup_code = """
-import lab1
+import lab1_JTS as lab1
 G = lab1.build_lastfm_graph() """
     test_code = """
 ls = lab1.how_many_degrees(G, '0', '7580')"""
@@ -549,7 +549,7 @@ def test_time_diameter(iteration=10000):
 
     """
     setup_code = """
-import lab1
+import lab1_JTS as lab1
 G = lab1.build_lastfm_graph() """
     test_code = """
 ls = lab1.diameters(G)"""

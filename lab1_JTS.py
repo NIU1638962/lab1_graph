@@ -245,17 +245,29 @@ def how_many_degrees(G, a, b):
         of nodes of the path stating at a and ending at b.
 
     '''
-    dist, next_node = floyd_algorithm(G)
-    if next_node[a][b] is None:
-        return None
-    if a == b:
-        return []
-    path = [a]
-    u = a
-    while u != b:
-        u = next_node[u][b]
-        path.append(u)
-    return path
+    total = [[a, 0]]
+    queue = [(a, 0)]
+    visited = []
+    while queue:
+        node, distance = queue.pop(0)
+        if node in visited:
+            continue
+        visited.append(node)
+        if node == b:
+            return distance
+        for adjacent in G.neighbors(node):
+            queue.append((adjacent, distance + 1))
+            total.append([adjacent, distance + 1])
+    distancedict = {}
+    for item in total:
+        node = item[0]
+        distance = item[1]
+        if node not in distancedict:
+            distancedict[node] = distance
+        elif distance < distancedict[node]:
+            distancedict[node] = distance
+    if b in distancedict:
+        return distancedict[b]
 
 
 def floyd_algorithm(G=graph):
@@ -280,27 +292,26 @@ def floyd_algorithm(G=graph):
     # Inicialize a ditionary of dictionaries (froming a matrix with keys), with
     # each value set to infinity, this dictionary will store the value of the
     # current shortest path betwen two nodes.
-    dist = {i: {j: float('inf') for j in G.nodes} for i in G.nodes}
+    dist = {i: {j: float('inf') for j in range(int(i))} for i in G.nodes}
     # Inicialize a ditionary of dictionaries (froming a matrix with keys), with
     # each value set to None, this dictionary will store the value of the
     # previus node of the shortest path betwen two nodes.
-    next_node = {i: {j: None for j in G.nodes} for i in G.nodes}
+    next_node = {i: {j: None for j in range(int(i))} for i in G.nodes}
     # We
     for i in G.nodes:
-        for j in G.nodes:
-            if i == j:
-                dist[i][j] = 0
-                next_node[i][j] = i
-            elif j in G[i]:
-                dist[i][j] = 1
-                next_node[i][j] = j
+        for j in range(int(i)):
+            if j != i:
+                if j in G[i]:
+                    dist[i][j] = 1
+                    next_node[i][j] = j
     for k in G.nodes:
         for i in G.nodes:
-            for j in G.nodes:
-                temp_dist = dist[i][k] + dist[k][j]
-                if dist[i][j] > temp_dist:
-                    dist[i][j] = temp_dist
-                    next_node[i][j] = next_node[i][k]
+            for j in range(int(i)):
+                if i != j:
+                    temp_dist = dist[i][k] + dist[k][j]
+                    if dist[i][j] > temp_dist:
+                        dist[i][j] = temp_dist
+                        next_node[i][j] = next_node[i][k]
     return dist, next_node
 
 
