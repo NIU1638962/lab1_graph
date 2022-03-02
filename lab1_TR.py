@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def build_lastfm_graph(targetfile=None,filename='lastfm_asia_edges.csv'):
+def build_lastfm_graph(filename='lastfm_asia_edges.csv'):
     f = open(filename, 'r')
     G = nx.Graph()
 
