@@ -618,11 +618,11 @@ try:
             else:
                 faster.append("TIE")
             TESTS_PASSED += 1
-            # Test 5.
-            print(TESTING.format("how_many_degrees(G, a, b)"))
-            print(PSD)
-            print("\t\t" + str(test_how_many_degrees(expected_graph_ex, obtained_graph_ex)))
-            TESTS_PASSED += 1
+            # # Test 5.
+            # print(TESTING.format("how_many_degrees(G, a, b)"))
+            # print(PSD)
+            # print("\t\t" + str(test_how_many_degrees(expected_graph_ex, obtained_graph_ex)))
+            # TESTS_PASSED += 1
             # Test 6.
             print(TESTING.format("diameters()"))
             print(PSD)
@@ -632,8 +632,8 @@ try:
             FILES_COMPLETED += 1
         except AssertionError as msg:
             print("\t\tFalse: " + str(msg))
-        except TypeError as msg:
-            print("\t\tFalse: " + str(msg))
+        # except TypeError as msg:
+        #     print("\t\tFalse: " + str(msg))
         finally:
             print(DELIMITER)
     # If all the the test are completed without an assertion error (test are
