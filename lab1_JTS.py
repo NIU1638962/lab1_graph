@@ -5,6 +5,7 @@ Created on Thu Feb 17 08:36:20 2022
 @author: Joel Tapia Salvador (1638962)
 """
 import networkx as nx
+import numpy as np
 
 NODES_FILE = "lastfm_asia_target.csv"
 EDGES_FILE = "lastfm_asia_edges.csv"
@@ -225,7 +226,7 @@ def DFS(G, node, dic_visited):
 
 
 def how_many_degrees(G, a, b):
-    '''
+    """
     Returns the shortest path of the graph G from a to b using Floyd's
     algorithm.
 
@@ -244,7 +245,7 @@ def how_many_degrees(G, a, b):
         If there is no path return an empty list, otherwise return the sequence
         of nodes of the path stating at a and ending at b.
 
-    '''
+    """
     total = [[a, 0]]
     queue = [(a, 0)]
     visited = []
@@ -271,7 +272,7 @@ def how_many_degrees(G, a, b):
 
 
 def floyd_algorithm(G=graph):
-    '''
+    """
     Executes Floyd's algorith in the graph G
     (https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm).
 
@@ -288,36 +289,46 @@ def floyd_algorithm(G=graph):
     next_node : list of list (matix)
         Matrix with the next node of the shortest path.
 
-    '''
+    """
     # Inicialize a ditionary of dictionaries (froming a matrix with keys), with
     # each value set to infinity, this dictionary will store the value of the
     # current shortest path betwen two nodes.
-    dist = [[float('inf') for j in range(int(i))] for i in G.nodes]
+    dist = [[float("inf") for j in range(int(i))] for i in G.nodes]
     # Inicialize a ditionary of dictionaries (froming a matrix with keys), with
     # each value set to None, this dictionary will store the value of the
     # previus node of the shortest path betwen two nodes.
-    next_node = [[None for j in range(int(i))] for i in G.nodes]
+    # next_node = [[None for j in range(int(i))] for i in G.nodes]
     # We
     for i in G.nodes:
-        for j in range(int(i)):
-            if j != int(i):
-                if str(j) in G[i]:
-                    dist[int(i)][j] = 1
-                    next_node[int(i)][j] = j
+        i = int(i)
+        for j in range(i):
+            if j != i:
+                if str(j) in G[str(i)]:
+                    dist[i][j] = 1
+                    # next_node[i][j] = j
     for k in G.nodes:
+        k = int(k)
         for i in G.nodes:
-            for j in range(int(i)):
-                if int(i) != j and int(k) < int(i) and int(k) != j:
-                    temp_dist = dist[int(i)][int(k)] + dist[j][int(k)]
-                    if dist[int(i)][j] > temp_dist:
-                        dist[int(i)][j] = temp_dist
-                        next_node[int(i)][j] = next_node[int(i)][int(k)]
-    return dist, next_node
+            i = int(i)
+            for j in range(i):
+                if int(i) != j and k != j and k != i:
+                    if i > k:
+                        if j > k:
+                            temp_dist = dist[i][k] + dist[j][k]
+                        else:
+                            temp_dist = dist[i][k] + dist[k][j]
+                    else:
+                        temp_dist = dist[k][i] + dist[k][j]
+                    if dist[i][j] > temp_dist:
+                        dist[i][j] = temp_dist
+                        # next_node[i][j] = next_node[i][k]
+    return dist
 
 
 def diameters(G=graph):
-    dist, next_node = floyd_algorithm(G)
+    dist = floyd_algorithm(G)
+    dist = dist[1:]
     diameter = max([max(i) for i in dist])
-    if diameter == float('inf'):
+    if diameter == float("inf"):
         return None
     return diameter
