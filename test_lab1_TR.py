@@ -209,6 +209,8 @@ def test_how_many_components_bfs(expected_graph, obtained_graph):
         "Number of components doesn't match with expected result."
         + "\n\t\tObtained number of components => "
         + str(obtained_number_of_components)
+        + "\n\t\tExpected number of components => "
+        + str(expected_number_of_components)
     )
     # Verifies that the components are the same (hence why we sorted them
     # previosly).
@@ -216,6 +218,8 @@ def test_how_many_components_bfs(expected_graph, obtained_graph):
         "Components doesn't match with expected result."
         + "\n\t\tObtained components => "
         + str(obtained_components)
+        + "\n\t\tExpected components => "
+        + str(expected_components)
     )
     return True
 
@@ -268,6 +272,8 @@ def test_how_many_components_dfs(expected_graph, obtained_graph):
         "Number of components doesn't match with expected result."
         + "\n\t\tObtained number of components => "
         + str(obtained_number_of_components)
+        + "\n\t\tExpected number of components => "
+        + str(expected_number_of_components)
     )
     # Verifies that the components are the same (hence why we sorted them
     # previosly).
@@ -275,6 +281,8 @@ def test_how_many_components_dfs(expected_graph, obtained_graph):
         "Components doesn't match with expected result."
         + "\n\t\tObtained components => "
         + str(obtained_components)
+        + "\n\t\tExpected components => "
+        + str(expected_components)
     )
     return True
 
@@ -300,14 +308,14 @@ def test_faster_reduced(name_i, iteration=10000):
     """
     setup_code = (
         """
-import lab1
+import lab1_TR as lab1
 NODES_FILE = "lastfm_asia_target_test_reduced"""
         + name_i
         + """.csv"
 EDGE_FILES = "lastfm_asia_edges_test_reduced"""
         + name_i
         + """.csv"
-G = lab1.build_lastfm_graph(NODES_FILE, EDGE_FILES)"""
+G = lab1.build_lastfm_graph(EDGE_FILES)"""
     )
     test_code1 = """
 ls = lab1.how_many_components_BFS(G)"""
@@ -341,65 +349,44 @@ def test_how_many_degrees(expected_graph, obtained_graph):
         The test is passed without an AssertionError generated.
 
     """
-    # The function "how_many_degrees" calls the funtion "floyd_algorithm" to
-    # calculate the shortest path every time, to avoid such waist of time,
-    # recalculating the matrix for every pair of nodes we run one time
-    # "floyd_algorithm" and extract the path as the same way that
-    # "how_many_degrees" does.
-    dist, next_node = lab1.floyd_algorithm(obtained_graph)
-    # We run "floyd_warshall" functions oF networkx to ensure that the
-    # result is the same as ours, when there is more than one possible
-    # shortest path "algorithms.shortest_paths.generic.shortest_path" function
-    # uses Dijkstra's algorithm that return a different shortest path than the
-    # one that returns Floyd's algorithm.
-    pred, _ = nx.floyd_warshall_predecessor_and_distance(expected_graph)
-
-    for node_a in list(expected_graph.nodes):
-        for node_b in list(expected_graph.nodes):
-            try:
-                # Makes a list with the path (copy of the "how_many_degrees")
-                if next_node[node_a][node_b] is None:
-                    obtained_path = None
-                elif node_a == node_b:
-                    obtained_path = []
-                else:
-                    obtained_path = [node_a]
-                    u = node_a
-                    while u != node_b:
-                        u = next_node[u][node_b]
-                        obtained_path.append(u)
-                # expected_path = nx.algorithms.shortest_paths.generic.shortest_path(
-                # expected_graph, node_a, node_b
-                # )
-                expected_path = nx.reconstruct_path(node_a, node_b, pred)
-                expected_length_path = len(expected_path)
-                obtained_length_path = len(obtained_path)
-                assert expected_length_path == obtained_length_path, (
-                    "Length of path doesn't match with expected result."
-                    + "\n\t\tObtained length of path => "
-                    + str(obtained_length_path)
-                    + "\n\t\tExpected length of path => "
-                    + str(expected_length_path)
-                )
-                assert expected_path == obtained_path, (
-                    "Path doesn't match with expected result."
-                    + "\n\t\tObtained path => "
-                    + str(obtained_path)
-                    + "\n\t\tExpected path => "
-                    + str(expected_path)
-                )
-            except nx.NetworkXNoPath:
-                assert obtained_path is None, (
-                    "Path not expected and path is returned."
-                    + "\n\t\tObtained path => "
-                    + str(obtained_path)
-                )
-            except KeyError:
-                assert obtained_path is None, (
-                    "Path not expected and path is returned."
-                    + "\n\t\tObtained path => "
-                    + str(obtained_path)
-                )
+    nodes_a = (0, 1, 2, 3, 4)
+    nodes_b = (4, 2, 4, 0, 1)
+    for node_a, node_b in zip(nodes_a, nodes_b):
+        try:
+            obtained_path = lab1.how_many_degrees(obtained_graph, node_a, node_b)
+            expected_path = nx.algorithms.shortest_paths.generic.shortest_path(
+                expected_graph, node_a, node_b
+            )
+            expected_length_path = len(expected_path)
+            obtained_length_path = len(obtained_path)
+            expected_length_path = len(expected_path)
+            obtained_length_path = len(obtained_path)
+            assert expected_length_path == obtained_length_path, (
+                "Length of path doesn't match with expected result."
+                + "\n\t\tObtained length of path => "
+                + str(obtained_length_path)
+                + "\n\t\tExpected length of path => "
+                + str(expected_length_path)
+            )
+            assert expected_path == obtained_path, (
+                "Path doesn't match with expected result."
+                + "\n\t\tObtained path => "
+                + str(obtained_path)
+                + "\n\t\tExpected path => "
+                + str(expected_path)
+            )
+        except nx.NetworkXNoPath:
+            assert obtained_path is None, (
+                "Path not expected and path is returned."
+                + "\n\t\tObtained path => "
+                + str(obtained_path)
+            )
+        except KeyError:
+            assert obtained_path is None, (
+                "Path not expected and path is returned."
+                + "\n\t\tObtained path => "
+                + str(obtained_path)
+            )
     return True
 
 
@@ -420,12 +407,16 @@ def test_diameters(expected_graph, obtained_graph):
             "Diameter doesn't match with expected result"
             + "\n\t\tObtained diameter => "
             + str(obtained_diameter)
+            + "\n\t\tExpected diameter => "
+            + str(expected_diameter)
         )
     except nx.NetworkXError:
         assert obtained_diameter is None, (
             "Diameter doesn't match with expected result"
             + "\n\t\tObtained diameter => "
             + str(obtained_diameter)
+            + "\n\t\tExpected diameter => "
+            +"None"
         )
     return True
 
@@ -450,11 +441,11 @@ def test_time_build(iteration=10000):
 
     """
     setup_code = """
-import lab1
+import lab1_TR as lab1
 NODES_FILE = "lastfm_asia_target.csv"
 EDGES_FILE = "lastfm_asia_edges.csv" """
     test_code = """
-ls = lab1.build_lastfm_graph(NODES_FILE, EDGES_FILE)"""
+ls = lab1.build_lastfm_graph(EDGES_FILE)"""
 
     times = timeit.repeat(setup=setup_code, stmt=test_code, number=iteration)
     times = sum(times)
@@ -482,7 +473,7 @@ def test_faster_extended(iteration=10000):
 
     """
     setup_code = """
-import lab1
+import lab1_TR as lab1
 G = lab1.build_lastfm_graph()"""
     test_code1 = """
 ls = lab1.how_many_components_BFS(G)"""
@@ -518,7 +509,7 @@ def test_time_how_many_degrees(iteration=10000):
 
     """
     setup_code = """
-import lab1
+import lab1_TR as lab1
 G = lab1.build_lastfm_graph() """
     test_code = """
 ls = lab1.how_many_degrees(G, '0', '7580')"""
@@ -549,7 +540,7 @@ def test_time_diameter(iteration=10000):
 
     """
     setup_code = """
-import lab1
+import lab1_TR as lab1
 G = lab1.build_lastfm_graph() """
     test_code = """
 ls = lab1.diameters(G)"""
