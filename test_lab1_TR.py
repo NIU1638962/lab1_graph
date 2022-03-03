@@ -379,12 +379,12 @@ def test_how_many_degrees(expected_graph, obtained_graph):
                 + "\n\t\tObtained path => "
                 + str(obtained_length_path)
             )
-        except KeyError:
-            assert obtained_path is None, (
-                "Path not expected and path is returned."
-                + "\n\t\tObtained path => "
-                + str(obtained_path)
-            )
+        # except KeyError:
+        #     assert obtained_path is None, (
+        #         "Path not expected and path is returned."
+        #         + "\n\t\tObtained path => "
+        #         + str(obtained_path)
+        #     )
     return True
 
 
