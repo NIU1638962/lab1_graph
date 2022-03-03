@@ -92,7 +92,7 @@ def how_many_degrees(G, a, b):
         return distancedict[b]
 
 
-def diameter(G):
+def diameters(G):
     longest = np.inf
     graph = list(G.nodes())
     distances = []

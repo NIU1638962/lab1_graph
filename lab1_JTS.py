@@ -246,8 +246,8 @@ def how_many_degrees(G, a, b):
         of nodes of the path stating at a and ending at b.
 
     """
-    a= int(a)
-    b=int(b)
+    a = int(a)
+    b = int(b)
     dic = {int(i): (float("inf"), None) for i in G.nodes}
     Q = [int(i) for i in G.nodes]
     dic[a] = (0, None)
