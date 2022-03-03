@@ -353,14 +353,12 @@ def test_how_many_degrees(expected_graph, obtained_graph):
     nodes_b = ('4', '2', '4', '0', '1')
     for node_a, node_b in zip(nodes_a, nodes_b):
         try:
-            obtained_path = lab1.how_many_degrees(obtained_graph, node_a, node_b)
+            obtained_length_path = lab1.how_many_degrees(obtained_graph, node_a, node_b)
             expected_path = nx.algorithms.shortest_paths.generic.shortest_path(
                 expected_graph, node_a, node_b
             )
             expected_length_path = len(expected_path)
-            obtained_length_path = len(obtained_path)
-            expected_length_path = len(expected_path)
-            obtained_length_path = len(obtained_path)
+            # obtained_length_path = len(obtained_path)
             assert expected_length_path == obtained_length_path, (
                 "Length of path doesn't match with expected result."
                 + "\n\t\tObtained length of path => "
@@ -368,18 +366,18 @@ def test_how_many_degrees(expected_graph, obtained_graph):
                 + "\n\t\tExpected length of path => "
                 + str(expected_length_path)
             )
-            assert expected_path == obtained_path, (
-                "Path doesn't match with expected result."
-                + "\n\t\tObtained path => "
-                + str(obtained_path)
-                + "\n\t\tExpected path => "
-                + str(expected_path)
-            )
+            # assert expected_path == obtained_path, (
+            #     "Path doesn't match with expected result."
+            #     + "\n\t\tObtained path => "
+            #     + str(obtained_path)
+            #     + "\n\t\tExpected path => "
+            #     + str(expected_path)
+            # )
         except nx.NetworkXNoPath:
-            assert obtained_path is None, (
+            assert obtained_length_path == 0, (
                 "Path not expected and path is returned."
                 + "\n\t\tObtained path => "
-                + str(obtained_path)
+                + str(obtained_length_path)
             )
         except KeyError:
             assert obtained_path is None, (

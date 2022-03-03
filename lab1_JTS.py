@@ -246,29 +246,27 @@ def how_many_degrees(G, a, b):
         of nodes of the path stating at a and ending at b.
 
     """
-    total = [[a, 0]]
-    queue = [(a, 0)]
-    visited = []
-    while queue:
-        node, distance = queue.pop(0)
-        if node in visited:
-            continue
-        visited.append(node)
-        if node == b:
-            return distance
-        for adjacent in G.neighbors(node):
-            queue.append((adjacent, distance + 1))
-            total.append([adjacent, distance + 1])
-    distancedict = {}
-    for item in total:
-        node = item[0]
-        distance = item[1]
-        if node not in distancedict:
-            distancedict[node] = distance
-        elif distance < distancedict[node]:
-            distancedict[node] = distance
-    if b in distancedict:
-        return distancedict[b]
+    a= int(a)
+    b=int(b)
+    dic = {int(i): (float("inf"), None) for i in G.nodes}
+    Q = [int(i) for i in G.nodes]
+    dic[a] = (0, None)
+    u = None
+    while len(Q) > 0 and u != b:
+        u = min(Q, key=lambda x: dic[x][0])
+        Q.remove(u)
+        for v in [int(i) for i in nx.neighbors(G, str(u)) if int(i) in Q]:
+            alt = dic[u][0] + 1
+            if alt < dic[v][0]:
+                dic[v] = (alt, u)
+    path = []
+    u = b
+    if dic[u][1] is not None or u == a:
+        while dic[u][1] is not None:
+            path.insert(0, str(u))
+            u = dic[u][1]
+        path.insert(0, str(a))
+    return path
 
 
 def floyd_algorithm(G=graph):

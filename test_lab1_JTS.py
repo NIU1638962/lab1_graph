@@ -134,7 +134,7 @@ def test_build_lastfm_graph(seed_i, range_t, name_i):
         t_b = ("\n\t\tObtained degrees => " + str(obtained_degree())
             + "\n\t\tExpected degrees => " + str(expected_degree())
         )
-            
+
 
         t_c = ("\n\t\tObtained density => " + str(obtained_density)
             + "\n\t\tExpected density => " + str(expected_density)
@@ -341,65 +341,42 @@ def test_how_many_degrees(expected_graph, obtained_graph):
         The test is passed without an AssertionError generated.
 
     """
-    # The function "how_many_degrees" calls the funtion "floyd_algorithm" to
-    # calculate the shortest path every time, to avoid such waist of time,
-    # recalculating the matrix for every pair of nodes we run one time
-    # "floyd_algorithm" and extract the path as the same way that
-    # "how_many_degrees" does.
-    dist, next_node = lab1.floyd_algorithm(obtained_graph)
-    # We run "floyd_warshall" functions oF networkx to ensure that the
-    # result is the same as ours, when there is more than one possible
-    # shortest path "algorithms.shortest_paths.generic.shortest_path" function
-    # uses Dijkstra's algorithm that return a different shortest path than the
-    # one that returns Floyd's algorithm.
-    pred, _ = nx.floyd_warshall_predecessor_and_distance(expected_graph)
-
-    for node_a in list(expected_graph.nodes):
-        for node_b in list(expected_graph.nodes):
-            try:
-                # Makes a list with the path (copy of the "how_many_degrees")
-                if next_node[node_a][node_b] is None:
-                    obtained_path = None
-                elif node_a == node_b:
-                    obtained_path = []
-                else:
-                    obtained_path = [node_a]
-                    u = node_a
-                    while u != node_b:
-                        u = next_node[u][node_b]
-                        obtained_path.append(u)
-                # expected_path = nx.algorithms.shortest_paths.generic.shortest_path(
-                # expected_graph, node_a, node_b
-                # )
-                expected_path = nx.reconstruct_path(node_a, node_b, pred)
-                expected_length_path = len(expected_path)
-                obtained_length_path = len(obtained_path)
-                assert expected_length_path == obtained_length_path, (
-                    "Length of path doesn't match with expected result."
-                    + "\n\t\tObtained length of path => "
-                    + str(obtained_length_path)
-                    + "\n\t\tExpected length of path => "
-                    + str(expected_length_path)
-                )
-                assert expected_path == obtained_path, (
-                    "Path doesn't match with expected result."
-                    + "\n\t\tObtained path => "
-                    + str(obtained_path)
-                    + "\n\t\tExpected path => "
-                    + str(expected_path)
-                )
-            except nx.NetworkXNoPath:
-                assert obtained_path is None, (
-                    "Path not expected and path is returned."
-                    + "\n\t\tObtained path => "
-                    + str(obtained_path)
-                )
-            except KeyError:
-                assert obtained_path is None, (
-                    "Path not expected and path is returned."
-                    + "\n\t\tObtained path => "
-                    + str(obtained_path)
-                )
+    nodes_a = ('0', '1', '2', '3', '4')
+    nodes_b = ('4', '2', '4', '0', '1')
+    for node_a, node_b in zip(nodes_a, nodes_b):
+        try:
+            obtained_path = lab1.how_many_degrees(obtained_graph, node_a, node_b)
+            obtained_length_path = len(obtained_path)
+            expected_path = nx.algorithms.shortest_paths.generic.shortest_path(
+                expected_graph, node_a, node_b
+            )
+            expected_length_path = len(expected_path)
+            assert expected_length_path == obtained_length_path, (
+                "Length of path doesn't match with expected result."
+                + "\n\t\tObtained length of path => "
+                + str(obtained_length_path)
+                + "\n\t\tExpected length of path => "
+                + str(expected_length_path)
+            )
+            assert expected_path == obtained_path, (
+                "Path doesn't match with expected result."
+                + "\n\t\tObtained path => "
+                + str(obtained_path)
+                + "\n\t\tExpected path => "
+                + str(expected_path)
+            )
+        except nx.NetworkXNoPath:
+            assert obtained_length_path == 0, (
+                "Path not expected and path is returned."
+                + "\n\t\tObtained path => "
+                + str(obtained_path)
+            )
+        # except KeyError:
+        #     assert obtained_path is None, (
+        #         "Path not expected and path is returned."
+        #         + "\n\t\tObtained path => "
+        #         + str(obtained_path)
+        #     )
     return True
 
 
@@ -618,11 +595,11 @@ try:
             else:
                 faster.append("TIE")
             TESTS_PASSED += 1
-            # # Test 5.
-            # print(TESTING.format("how_many_degrees(G, a, b)"))
-            # print(PSD)
-            # print("\t\t" + str(test_how_many_degrees(expected_graph_ex, obtained_graph_ex)))
-            # TESTS_PASSED += 1
+            # Test 5.
+            print(TESTING.format("how_many_degrees(G, a, b)"))
+            print(PSD)
+            print("\t\t" + str(test_how_many_degrees(expected_graph_ex, obtained_graph_ex)))
+            TESTS_PASSED += 1
             # Test 6.
             print(TESTING.format("diameters()"))
             print(PSD)
