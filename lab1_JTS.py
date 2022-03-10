@@ -227,8 +227,8 @@ def DFS(G, node, dic_visited):
 
 def how_many_degrees(G, a, b):
     """
-    Returns the shortest path of the graph G from a to b using Floyd's
-    algorithm.
+    Returns the shortest path of the graph G from a to b using Dijkstra's
+    algorithm (https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm).
 
     Parameters
     ----------
@@ -288,14 +288,11 @@ def floyd_algorithm(G=graph):
         Matrix with the next node of the shortest path.
 
     """
-    # Inicialize a ditionary of dictionaries (froming a matrix with keys), with
+    # Inicialize a list of list (froming the bottom traingle of a matrix), with
     # each value set to infinity, this dictionary will store the value of the
-    # current shortest path betwen two nodes.
+    # current shortest path betwen two nodes (we can store only the bottom
+    # triangle because the matrix is symetic because the graph is not directed)
     dist = [[float("inf") for j in range(int(i))] for i in G.nodes]
-    # Inicialize a ditionary of dictionaries (froming a matrix with keys), with
-    # each value set to None, this dictionary will store the value of the
-    # previus node of the shortest path betwen two nodes.
-    # next_node = [[None for j in range(int(i))] for i in G.nodes]
     # We
     for i in G.nodes:
         i = int(i)
@@ -303,7 +300,6 @@ def floyd_algorithm(G=graph):
             if j != i:
                 if str(j) in G[str(i)]:
                     dist[i][j] = 1
-                    # next_node[i][j] = j
     for k in G.nodes:
         k = int(k)
         for i in G.nodes:
@@ -319,7 +315,6 @@ def floyd_algorithm(G=graph):
                         temp_dist = dist[k][i] + dist[k][j]
                     if dist[i][j] > temp_dist:
                         dist[i][j] = temp_dist
-                        # next_node[i][j] = next_node[i][k]
     return dist
 
 
@@ -327,6 +322,8 @@ def diameters(G=graph):
     dist = floyd_algorithm(G)
     dist = dist[1:]
     diameter = max([max(i) for i in dist])
-    if diameter == float("inf"):
-        return None
+    # if diameter == float("inf"):
+        # return None
+    with open("diameter.txt", "w") as file:
+        file.write(str(diameter))
     return diameter
