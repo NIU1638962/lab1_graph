@@ -260,7 +260,7 @@ def test_how_many_components_dfs(expected_graph, obtained_graph):
         key=len,
         reverse=True,
     )
-    # Measures the leng of the list obtained by the function
+    # Measures the length of the list obtained by the function
     # "how_many_components_DFS" from "lab1".
     obtained_number_of_components = len(obtained_components)
     # Verifies the number of components.
@@ -371,25 +371,17 @@ def test_how_many_degrees(expected_graph, obtained_graph):
                 + "\n\t\tObtained path => "
                 + str(obtained_path)
             )
-        # except KeyError:
-        #     assert obtained_path is None, (
-        #         "Path not expected and path is returned."
-        #         + "\n\t\tObtained path => "
-        #         + str(obtained_path)
-        #     )
+        except KeyError:
+            assert obtained_path is None, (
+                "Path not expected and path is returned."
+                + "\n\t\tObtained path => "
+                + str(obtained_path)
+            )
     return True
 
 
 def test_diameters(expected_graph, obtained_graph):
-    """
 
-
-    Returns
-    -------
-    bool
-        DESCRIPTION.
-
-    """
     try:
         obtained_diameter = lab1.diameters(obtained_graph)
         expected_diameter = nx.algorithms.distance_measures.diameter(expected_graph)
@@ -405,38 +397,6 @@ def test_diameters(expected_graph, obtained_graph):
             + str(obtained_diameter)
         )
     return True
-
-
-def test_time_build(iteration=10000):
-    """
-    Tests the speed of the function "build_lastfm_graph" over a given number of
-    iterations (by default 10000) using the intended graph.
-
-    Parameters
-    ----------
-    iteration : integer, optional
-        Number of times the methods are tested to evaluate velocity. The
-        default is 10000.
-
-    Returns
-    -------
-    The total time of BFS function anf DFS function, the average for iteration
-    of BFS funtion anf DFS function and the relation between the time of the
-    BFS function anf DFS fucntion in a string. If it is > 1, BFS is slower than
-    DFS and if it is < 1 BFS is faster than DFS.
-
-    """
-    setup_code = """
-import lab1_JTS as lab1
-NODES_FILE = "lastfm_asia_target.csv"
-EDGES_FILE = "lastfm_asia_edges.csv" """
-    test_code = """
-ls = lab1.build_lastfm_graph(NODES_FILE, EDGES_FILE)"""
-
-    times = timeit.repeat(setup=setup_code, stmt=test_code, number=iteration)
-    times = sum(times)
-    average = times / iteration
-    return times, average
 
 
 def test_faster_extended(iteration=10000):
@@ -475,72 +435,10 @@ ls = lab1.how_many_components_DFS(G)"""
     return times1, times2, average1, average2, proportion
 
 
-def test_time_how_many_degrees(iteration=10000):
-    """
-    Tests the speed of the function "how_many_degrees" over a given number of
-    iterations (by default 10000) using the intended graph.
-
-    Parameters
-    ----------
-    iteration : integer, optional
-        Number of times the methods are tested to evaluate velocity. The
-        default is 10000.
-
-    Returns
-    -------
-    The total time of BFS function anf DFS function, the average for iteration
-    of BFS funtion anf DFS function and the relation between the time of the
-    BFS function anf DFS fucntion in a string. If it is > 1, BFS is slower than
-    DFS and if it is < 1 BFS is faster than DFS.
-
-    """
-    setup_code = """
-import lab1_JTS as lab1
-G = lab1.build_lastfm_graph() """
-    test_code = """
-ls = lab1.how_many_degrees(G, '0', '7580')"""
-
-    times = timeit.repeat(setup=setup_code, stmt=test_code, number=iteration)
-    times = sum(times)
-    average = times / iteration
-    return times, average
-
-
-def test_time_diameter(iteration=10000):
-    """
-    Tests the speed of the function "diameters" over a given number of
-    iterations (by default 10000) using the intended graph.
-
-    Parameters
-    ----------
-    iteration : integer, optional
-        Number of times the methods are tested to evaluate velocity. The
-        default is 10000.
-
-    Returns
-    -------
-    The total time of BFS function anf DFS function, the average for iteration
-    of BFS funtion anf DFS function and the relation between the time of the
-    BFS function anf DFS fucntion in a string. If it is > 1, BFS is slower than
-    DFS and if it is < 1 BFS is faster than DFS.
-
-    """
-    setup_code = """
-import lab1_JTS as lab1
-G = lab1.build_lastfm_graph() """
-    test_code = """
-ls = lab1.diameters(G)"""
-
-    times = timeit.repeat(setup=setup_code, stmt=test_code, number=iteration)
-    times = sum(times)
-    average = times / iteration
-    return times, average
-
-
 # MAIN
 """Executes the following functions given 10 diferent files and seeds and a
 BFS/DFS comparation with the lastfm graph. In total 11 files and 64 tests"""
-# Variable used to store tha inforamtion about the tests.
+# Variable used to store the inforamtion about the tests.
 TESTS_PASSED = 0
 FILES_COMPLETED = 0
 faster = []
@@ -552,7 +450,24 @@ times = int(
 )
 # Creates the tests files.
 try:
-    generate_csv_files_from_random_seed
+    for i, j, n in zip(SEEDS, RANGES, NAMES):
+        random.seed(i)
+        with open(
+            "lastfm_asia_target_test_reduced" + n + ".csv", "w", encoding="utf-8"
+        ) as file:
+            file.write("id,target\n")
+            [
+                file.write(str(i) + "," + str(random.randint(0, j[0])) + "\n")
+                for i in range(j[1])
+            ]
+        with open(
+            "lastfm_asia_edges_test_reduced" + n + ".csv", "w", encoding="utf-8"
+        ) as file:
+            file.write("node_1,node_2\n")
+            [
+                file.write(str(i) + "," + str(random.randint(0, j[1] - 1)) + "\n")
+                for i in range(j[2])
+            ]
     # Bucle used to executed the test with each test-file and test-seed.
     for seeds, ranges, names in zip(SEEDS, RANGES, NAMES):
         # Error control, if an assert error is raised, catch the error, prints the
@@ -609,22 +524,14 @@ try:
             FILES_COMPLETED += 1
         except AssertionError as msg:
             print("\t\tFalse: " + str(msg))
-        # except TypeError as msg:
-        #     print("\t\tFalse: " + str(msg))
+        except TypeError as msg:
+            print("\t\tFalse: " + str(msg))
         finally:
             print(DELIMITER)
     # If all the the test are completed without an assertion error (test are
     # passed), executes the functions with the intended lastfm graph and calculates
     # the execution time.
-    if FILES_COMPLETED == len(NAMES) + 1:
-        # Time 1.
-        print(DELIMITER)
-        print("TESTING FILE: lastfm")
-        print(TM3.format("build_lastfm_graph()"))
-        tp = test_time_build(times)
-        print(TM2.format("build_lastfm_graph()", tp[0], tp[1]))
-        TESTS_PASSED += 1
-        # Time 2
+    if FILES_COMPLETED == len(NAMES):
         print("Testing relation time of BFS/DFS using intended graph:")
         tp = test_faster_extended(times)
         print(TM1.format(tp[0], tp[1], tp[2], tp[3], tp[4]))
@@ -635,25 +542,14 @@ try:
         else:
             faster.append("TIE")
         TESTS_PASSED += 1
-        # Time 3
-        print(TM3.format("how_many_degrees(G, a, b)"))
-        tp = test_time_how_many_degrees(times)
-        print(TM2.format("how_many_degrees(G, a, b)", tp[0], tp[1]))
-        TESTS_PASSED += 1
-        # Time 4
-        print(TM3.format("diameters()"))
-        tp = test_time_diameter(times)
-        print(TM2.format("diameters()", tp[0], tp[1]))
-        TESTS_PASSED += 1
-
         FILES_COMPLETED += 1
         print(DELIMITER)
     # Prints the results of the tests.
     print("Files completed: " + str(FILES_COMPLETED) + "/" + str(len(NAMES) + 1))
-    print("Tests passed: " + str(TESTS_PASSED) + "/" + str(6 * len(NAMES) + 4))
+    print("Tests passed: " + str(TESTS_PASSED) + "/" + str(6 * len(NAMES) + 1))
     print("Tests faster with BFS: " + str(faster.count("BFS")) + "/" + str(len(faster)))
     print("Tests faster with DFS: " + str(faster.count("DFS")) + "/" + str(len(faster)))
-    # Delate the test files.
+# Delate the test files.
 finally:
     for names in NAMES:
         os.remove(NODES_FILE + names + CSV)

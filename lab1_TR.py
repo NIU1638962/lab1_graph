@@ -15,7 +15,7 @@ def build_lastfm_graph(filename="lastfm_asia_edges.csv"):
     return G
 
 
-G = build_lastfm_graph()
+# G = build_lastfm_graph()
 
 
 def how_many_components_BFS(G):
@@ -104,3 +104,6 @@ def diameters(G):
                 distances.append(how_many_degrees(G, i, j))
     distances = list(filter(None, distances))
     return max(distances)
+
+G = build_lastfm_graph("lastfm_asia_edges_test_reduced0.csv")
+print(how_many_degrees(G, "1","2"))

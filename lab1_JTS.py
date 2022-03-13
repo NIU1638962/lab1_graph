@@ -248,17 +248,27 @@ def how_many_degrees(G, a, b):
     """
     a = int(a)
     b = int(b)
+    # Inicialize a dictionary for every node with a tuple (infinity, None).
     dic = {int(i): (float("inf"), None) for i in G.nodes}
+    # Genrate a list with every node of hte graph.
     Q = [int(i) for i in G.nodes]
+    # Change the value of the item of the node "a" with the tuple (0, None).
     dic[a] = (0, None)
     u = None
+    # Bucle is executed as long as not every node is checked or until the 
+    # node b is checked.
     while len(Q) > 0 and u != b:
+        # Picks the node with the less distnace of the list Q.
         u = min(Q, key=lambda x: dic[x][0])
+        # Remove it from the list Q.
         Q.remove(u)
+        # Checks for every adjacent node of u if its faster going to it 
+        # through the node u.
         for v in [int(i) for i in nx.neighbors(G, str(u)) if int(i) in Q]:
             alt = dic[u][0] + 1
             if alt < dic[v][0]:
                 dic[v] = (alt, u)
+    # Reconstruct the fatest path used.
     path = []
     u = b
     if dic[u][1] is not None or u == a:
@@ -288,24 +298,31 @@ def floyd_algorithm(G=graph):
         Matrix with the next node of the shortest path.
 
     """
-    # Inicialize a list of list (froming the bottom traingle of a matrix), with
+    # Inicialize a list of list (forming the bottom traingle of a matrix), with
     # each value set to infinity, this dictionary will store the value of the
     # current shortest path betwen two nodes (we can store only the bottom
     # triangle because the matrix is symetic because the graph is not directed)
     dist = [[float("inf") for j in range(int(i))] for i in G.nodes]
-    # We
+    # For every pair of nodes of the bottom triangle if they are joined by the 
+    # edge change the infinity with a 1.
     for i in G.nodes:
         i = int(i)
         for j in range(i):
             if j != i:
                 if str(j) in G[str(i)]:
                     dist[i][j] = 1
+    # Reiterates the botton triangle of the matrix the number of times as nodes
+    # there is and acces for every row and column (if the index of the column 
+    # or row are from the upper triangle, invert them to acces the bottom 
+    # triangle, thanks to the symmetry) and if the sum of both position is 
+    # greater that its coordinate change it (Floyd's Algorithm). 
     for k in G.nodes:
         k = int(k)
         for i in G.nodes:
             i = int(i)
             for j in range(i):
                 if int(i) != j and k != j and k != i:
+                    # Makes sure that the position is in the bottom triangle.
                     if i > k:
                         if j > k:
                             temp_dist = dist[i][k] + dist[j][k]
@@ -319,11 +336,15 @@ def floyd_algorithm(G=graph):
 
 
 def diameters(G=graph):
-    dist = floyd_algorithm(G)
-    dist = dist[1:]
-    diameter = max([max(i) for i in dist])
-    # if diameter == float("inf"):
-        # return None
-    with open("diameter.txt", "w") as file:
-        file.write(str(diameter))
-    return diameter
+    # If the graph has more than one component the maximum element of
+    #  the matrix will be infinity, so we do not apply the algorithm. 
+    if len(how_many_components_DFS(G)) == 1:
+        # Executes the function of the Floyd's algorithm with the graph
+        dist = floyd_algorithm(G)
+        # The first row is empty so we ignore it because it gives error
+        # with max() function of Python.
+        dist = dist[1:]
+        # Search the maximum element of every row of triangle and the 
+        # the maximum element of them.
+        return max([max(i) for i in dist])
+    return None
