@@ -5,7 +5,6 @@ Created on Thu Feb 17 08:36:20 2022
 @author: Joel Tapia Salvador (1638962)
 """
 import networkx as nx
-import numpy as np
 
 NODES_FILE = "lastfm_asia_target.csv"
 EDGES_FILE = "lastfm_asia_edges.csv"
@@ -255,14 +254,14 @@ def how_many_degrees(G, a, b):
     # Change the value of the item of the node "a" with the tuple (0, None).
     dic[a] = (0, None)
     u = None
-    # Bucle is executed as long as not every node is checked or until the 
+    # Bucle is executed as long as not every node is checked or until the
     # node b is checked.
     while len(Q) > 0 and u != b:
         # Picks the node with the less distnace of the list Q.
         u = min(Q, key=lambda x: dic[x][0])
         # Remove it from the list Q.
         Q.remove(u)
-        # Checks for every adjacent node of u if its faster going to it 
+        # Checks for every adjacent node of u if its faster going to it
         # through the node u.
         for v in [int(i) for i in nx.neighbors(G, str(u)) if int(i) in Q]:
             alt = dic[u][0] + 1
@@ -303,7 +302,7 @@ def floyd_algorithm(G=graph):
     # current shortest path betwen two nodes (we can store only the bottom
     # triangle because the matrix is symetic because the graph is not directed)
     dist = [[float("inf") for j in range(int(i))] for i in G.nodes]
-    # For every pair of nodes of the bottom triangle if they are joined by the 
+    # For every pair of nodes of the bottom triangle if they are joined by the
     # edge change the infinity with a 1.
     for i in G.nodes:
         i = int(i)
@@ -312,10 +311,10 @@ def floyd_algorithm(G=graph):
                 if str(j) in G[str(i)]:
                     dist[i][j] = 1
     # Reiterates the botton triangle of the matrix the number of times as nodes
-    # there is and acces for every row and column (if the index of the column 
-    # or row are from the upper triangle, invert them to acces the bottom 
-    # triangle, thanks to the symmetry) and if the sum of both position is 
-    # greater that its coordinate change it (Floyd's Algorithm). 
+    # there is and acces for every row and column (if the index of the column
+    # or row are from the upper triangle, invert them to acces the bottom
+    # triangle, thanks to the symmetry) and if the sum of both position is
+    # greater that its coordinate change it (Floyd's Algorithm).
     for k in G.nodes:
         k = int(k)
         for i in G.nodes:
@@ -336,15 +335,31 @@ def floyd_algorithm(G=graph):
 
 
 def diameters(G=graph):
+    """
+    Calculates the diameter of the given graph usinf Floyd's algorithm.
+
+    Parameters
+    ----------
+    G : networkx graph type
+        Graph from wich we want to extract the shortest path. The default is
+        graph.
+
+    Returns
+    -------
+    int or None
+        Returns the diameter of the graph or None if the graph has mor than one
+        component.
+
+    """
     # If the graph has more than one component the maximum element of
-    #  the matrix will be infinity, so we do not apply the algorithm. 
+    #  the matrix will be infinity, so we do not apply the algorithm.
     if len(how_many_components_DFS(G)) == 1:
         # Executes the function of the Floyd's algorithm with the graph
         dist = floyd_algorithm(G)
         # The first row is empty so we ignore it because it gives error
         # with max() function of Python.
         dist = dist[1:]
-        # Search the maximum element of every row of triangle and the 
+        # Search the maximum element of every row of triangle and the
         # the maximum element of them.
         return max([max(i) for i in dist])
     return None
