@@ -122,22 +122,27 @@ def test_build_lastfm_graph(seed_i, range_t, name_i):
         t_a = (
             "\n\t\tObtained number of nodes => {0}"
             + "\n\t\tObtained numbes of edges => {1}"
-            +"\n\t\tExpected number of nodes => {2}"
+            + "\n\t\tExpected number of nodes => {2}"
             + "\n\t\tExpected numbes of edges => {3}"
         )
         t_a = t_a.format(
             obtained_number_of_nodes,
             obtained_number_of_edges,
             expected_number_of_nodes,
-            expected_number_of_edges
+            expected_number_of_edges,
         )
-        t_b = ("\n\t\tObtained degrees => " + str(obtained_degree())
-            + "\n\t\tExpected degrees => " + str(expected_degree())
+        t_b = (
+            "\n\t\tObtained degrees => "
+            + str(obtained_degree())
+            + "\n\t\tExpected degrees => "
+            + str(expected_degree())
         )
 
-
-        t_c = ("\n\t\tObtained density => " + str(obtained_density)
-            + "\n\t\tExpected density => " + str(expected_density)
+        t_c = (
+            "\n\t\tObtained density => "
+            + str(obtained_density)
+            + "\n\t\tExpected density => "
+            + str(expected_density)
         )
         # Verifies number of nodes.
         assert obtained_number_of_nodes == expected_number_of_nodes, (
@@ -341,8 +346,8 @@ def test_how_many_degrees(expected_graph, obtained_graph):
         The test is passed without an AssertionError generated.
 
     """
-    nodes_a = ('0', '1', '2', '3', '4')
-    nodes_b = ('4', '2', '4', '0', '1')
+    nodes_a = ("0", "1", "2", "3", "4")
+    nodes_b = ("4", "2", "4", "0", "1")
     for node_a, node_b in zip(nodes_a, nodes_b):
         try:
             obtained_path = lab1.how_many_degrees(obtained_graph, node_a, node_b)
@@ -488,7 +493,9 @@ try:
             print(PSD)
             print(
                 "\t\t"
-                + str(test_how_many_components_bfs(expected_graph_ex, obtained_graph_ex))
+                + str(
+                    test_how_many_components_bfs(expected_graph_ex, obtained_graph_ex)
+                )
             )
             TESTS_PASSED += 1
             # Test 3.
@@ -496,7 +503,9 @@ try:
             print(PSD)
             print(
                 "\t\t"
-                + str(test_how_many_components_dfs(expected_graph_ex, obtained_graph_ex))
+                + str(
+                    test_how_many_components_dfs(expected_graph_ex, obtained_graph_ex)
+                )
             )
             TESTS_PASSED += 1
             # Test 4.
@@ -513,7 +522,10 @@ try:
             # Test 5.
             print(TESTING.format("how_many_degrees(G, a, b)"))
             print(PSD)
-            print("\t\t" + str(test_how_many_degrees(expected_graph_ex, obtained_graph_ex)))
+            print(
+                "\t\t"
+                + str(test_how_many_degrees(expected_graph_ex, obtained_graph_ex))
+            )
             TESTS_PASSED += 1
             # Test 6.
             print(TESTING.format("diameters()"))
